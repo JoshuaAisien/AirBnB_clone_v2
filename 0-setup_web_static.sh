@@ -64,7 +64,7 @@ EOF
 sudo nginx -t && sudo systemctl restart nginx
 
 # Ensure the script exits
-exit 0
+exit 0 /n
 
 
 
