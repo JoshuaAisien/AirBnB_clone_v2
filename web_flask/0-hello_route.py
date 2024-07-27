@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 from flask import Flask
 """ Initiallization file for the Web_glask package"""
 app = Flask(__name__)
