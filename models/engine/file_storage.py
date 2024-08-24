@@ -57,3 +57,9 @@ class FileStorage:
             pass
         except json.JSONDecodeError:
             pass
+    def delete(self, obj=None):
+        """ Deletes obj from __objects dictionary id it exists"""
+        if obj:
+            obj_key = f'{obj.__class__.__name__}.{obj.id}'
+            if obj_key in FileStorage.__objects:
+                del FileStorage.__objects[obj_key]
