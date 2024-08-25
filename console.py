@@ -160,9 +160,10 @@ class HBNBCommand(cmd.Cmd):
             # store keyword and value in dictionary
             kwargs[key] = value
         new_instance = HBNBCommand.classes[class_name](**kwargs)
+        storage.new(new_instance)
         storage.save()
         print(new_instance.id)
-        storage.save()
+
 
     def help_create(self):
         """ Help information for the create method """
@@ -246,23 +247,18 @@ class HBNBCommand(cmd.Cmd):
                 return
 
             cls = HBNBCommand.classes[args]
-            objects = storage.all()  # Retrieve all objects from storage
+            objects = storage.all(cls)  # Retrieve all objects of the specified class
             for key, value in objects.items():
-                if isinstance(value, cls):
-                    print_list.append(str(value))
-
-            if not print_list:
-                print("** no instance found **")
-            else:
-                print("[", ", ".join(print_list), "]")
+                print_list.append(str(value))
         else:
             objects = storage.all()  # Retrieve all objects from storage
-            if not objects:
-                print("** no instance found **")
-                return
+            for obj in objects.values():
+                print_list.append(str(obj))
 
-            print_list = [str(obj) for obj in objects.values()]
-            print(print_list)
+        if not print_list:
+            print("** no instance found **")
+        else:
+            print("[", ", ".join(print_list), "]")
 
     def help_all(self):
         """ Help information for the all command """

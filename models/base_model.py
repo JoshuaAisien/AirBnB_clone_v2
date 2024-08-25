@@ -1,25 +1,35 @@
 #!/usr/bin/python3
 """This module defines a base class for all models in our hbnb clone"""
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import String, Column, DateTime
 import uuid
 from datetime import datetime
+import models
 
 
+Base = declarative_base()
 class BaseModel:
     """A base class for all hbnb models"""
+    id = Column(String(60), primary_key=True, nullable=False, unique=True, default=lambda: str(uuid.uuid4()))
+    create_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
 
     def __init__(self, *args, **kwargs):
         """Instantiates a new model"""
-        from models import storage
 
         if not kwargs:
             # New instance creation
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            storage.new(self)
         else:
-            # Update instance dict with kwargs
+            # Update dict with kwargs
             self.__dict__.update(kwargs)
+
+            # dynamically set attributes with values
+            for key, value in kwargs.items():
+                if key != '__class__':
+                    setattr(self, key, value)
 
             # Convert strings to datetime objects
             if 'created_at' in kwargs and isinstance(kwargs['created_at'], str):
@@ -35,7 +45,7 @@ class BaseModel:
             # If id is not provided, assume this is a new instance and add it to storage
             if 'id' not in kwargs:
                 self.id = str(uuid.uuid4())
-                storage.new(self)
+
 
     def __str__(self):
         """Returns a string representation of the instance"""
@@ -46,7 +56,8 @@ class BaseModel:
         """Updates updated_at with current time when instance is changed"""
         from models import storage
         self.updated_at = datetime.now()
-        storage.save()
+        models.storage.new(self)
+        models.storage.save()
 
     def to_dict(self):
         """Convert instance into dict format"""
@@ -57,5 +68,11 @@ class BaseModel:
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
         return dictionary
+
+    def delete(self):
+        """ a new public instance method: def delete(self):
+         to delete the current instance from the storage (models.storage) by calling the method delete
+         """
+        models.storage.delete(self)
 
 
