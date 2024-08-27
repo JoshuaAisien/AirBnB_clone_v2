@@ -3,8 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import String, Column, ForeignKey, Integer, Float
 from sqlalchemy.orm import relationship
-from models.engine.db_storage import DBStorage
-from models.review import Review
+from models.amenity import place_amenity
 
 class Place(BaseModel, Base):
     """ A place to stay """
@@ -25,6 +24,7 @@ class Place(BaseModel, Base):
     reviews = relationship("Review", back_populates="place", cascade="all, delete-orphan")
     cities = relationship('City', back_populates='places')
     user = relationship('User', back_populates='places')
+    amenities = relationship("Amenity", secondary=place_amenity, viewonly=False, back_populates='place_amenities')
     @property
     def review_list(self):
         """  returns the list of Review instances with place_id equals to the current Place.id """
