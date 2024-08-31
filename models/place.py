@@ -31,3 +31,7 @@ class Place(BaseModel, Base):
         from models import storage
         from models.review import Review
         return [review_list for review_list in storage.all(Review).values() if review_list.place_id == self.id]
+
+
+to_set = {'goat', 'school','class'}
+print(to_set[0])
