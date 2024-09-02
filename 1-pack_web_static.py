@@ -14,14 +14,14 @@ def do_pack():
 
     # Generate the archive name based on the current date and time
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-    archive_name = "versions/web_static_{}.tgz".format(timestamp)
+    archive_path = "versions/web_static_{}.tgz".format(timestamp)
 
     # Create the archive using the tar command
-    command = "tar -czvf {} web_static".format(archive_name)
+    command = "tar -czvf {} web_static".format(archive_path)
     result = local(command, capture=True)
 
     # Check if the archive was successfully created
     if result.succeeded:
-        return archive_name
+        return archive_path
     else:
         return None
