@@ -1,11 +1,12 @@
-from fabric.api import env, run, put, local
+from fabric.api import env,put, local, sudo
 from datetime import datetime
 import os
 
 """ 
-
+This file does the full deployment 
 """
-
+env.hosts = ['54.167.94.80','100.25.10.251' ]
+env.key_filename = '~/.ssh/id_rsa'
 def do_pack():
     """
     Generates a .tgz archive from the contents of the web_static folder.
@@ -47,21 +48,16 @@ def do_deploy(archive_path):
         put(archive_path, '/tmp/')
 
         # create the target directory on the remote server
-        run(f'mkdir -p /data/web_static/releases/{archive_name}')
+        sudo(f'mkdir -p /data/web_static/releases/{archive_name}')
 
         # uncompress and extract the archive to the target directory just created above
-        run(f"tar -xvf /tmp/{basename} -C /data/web_static/releases/{archive_name}")
+        sudo(f"tar -xvf /tmp/{basename} -C /data/web_static/releases/{archive_name}")
 
-        # move the archive directory to the parent directory
-        run(f'mv /data/web_static/releases/{archive_name}/web_static/* /data/web_static/releases/{archive_name}')
-
-        # remove the parent directory created
-        run(f'mv /data/web_static/releases/{archive_name}/web_static/')
         # delete the archive from the server
-        run(f'rm -rf /tmp/{basename}')
+        sudo(f'rm -rf /tmp/{basename}')
 
         # delete the symbolic link
-        run(f'ln -sfn /data/web_static/releases/{archive_name} /data/web_static/current')
+        sudo(f'ln -sfn /data/web_static/releases/{archive_name} /data/web_static/current')
 
         return True
     except Exception as e:
