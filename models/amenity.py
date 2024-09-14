@@ -11,7 +11,7 @@ place_amenity = Table('place_amenity',
                       Column('amenity_id', String(60), ForeignKey('amenities.id'), primary_key=True, nullable=False)
                       )
 class Amenity(BaseModel, Base):
-
+    __table_args__ = {'mysql_charset': 'utf8mb4', 'mysql_collate': 'utf8mb4_0900_ai_ci'}
     __tablename__ = 'amenities'
     name = Column(String(128), nullable=False)
     place_amenities = relationship('Place', secondary=place_amenity, back_populates='amenities')

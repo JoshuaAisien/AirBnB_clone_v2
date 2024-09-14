@@ -21,7 +21,7 @@ class FileStorage:
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
-        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+        self.all().update({obj.__class__.__name__+ '.' + obj.id: obj})
 
     def save(self):
         """Saves storage dictionary to file"""
@@ -29,7 +29,8 @@ class FileStorage:
             temp = {}
             temp.update(FileStorage.__objects)
             for key, val in temp.items():
-                temp[key] = val.to_dict()
+                obj_dict = val.to_dict()
+                temp[key] = obj_dict
             json.dump(temp, f)
 
     def reload(self):
@@ -43,23 +44,38 @@ class FileStorage:
         from models.review import Review
 
         classes = {
-                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-                    'State': State, 'City': City, 'Amenity': Amenity,
-                    'Review': Review
-                  }
+            'BaseModel': BaseModel, 'User': User, 'Place': Place,
+            'State': State, 'City': City, 'Amenity': Amenity,
+            'Review': Review
+        }
         try:
-            temp = {}
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                    self.all()[key] = classes[val['__class__']](**val)
+                    class_name = val.pop('__class__', None)
+                    if class_name:
+                        cls = classes.get(class_name)
+                        if cls:
+                            # Create a new instance of the class
+                            obj = cls(**val)
+                            self.all()[key] = obj
+
         except FileNotFoundError:
             pass
         except json.JSONDecodeError:
             pass
+
+        if '_sa_instance_state' in FileStorage.__objects.keys():
+            del FileStorage.__objects['_sa_instance_state']
+
     def delete(self, obj=None):
         """ Deletes obj from __objects dictionary id it exists"""
         if obj:
             obj_key = f'{obj.__class__.__name__}.{obj.id}'
             if obj_key in FileStorage.__objects:
                 del FileStorage.__objects[obj_key]
+
+    def close(self):
+        """ method for deserializing the json file to objects"""
+        self.reload()
+

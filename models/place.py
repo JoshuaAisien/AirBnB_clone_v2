@@ -8,6 +8,7 @@ from models.amenity import place_amenity
 class Place(BaseModel, Base):
     """ A place to stay """
     __tablename__ = "places"
+    __table_args__ = {'mysql_charset': 'utf8mb4', 'mysql_collate': 'utf8mb4_0900_ai_ci'}
 
     city_id = Column(String(60), ForeignKey("cities.id"), nullable=False)
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
@@ -23,7 +24,7 @@ class Place(BaseModel, Base):
     # Relationship with User and city
     reviews = relationship("Review", back_populates="place", cascade="all, delete-orphan")
     cities = relationship('City', back_populates='places')
-    user = relationship('User', back_populates='places')
+    user= relationship('User', back_populates='places')
     amenities = relationship("Amenity", secondary=place_amenity, viewonly=False, back_populates='place_amenities')
     @property
     def review_list(self):
@@ -31,7 +32,3 @@ class Place(BaseModel, Base):
         from models import storage
         from models.review import Review
         return [review_list for review_list in storage.all(Review).values() if review_list.place_id == self.id]
-
-
-to_set = {'goat', 'school','class'}
-print(to_set[0])

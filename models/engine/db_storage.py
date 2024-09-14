@@ -5,7 +5,7 @@ from models.base_model import Base
 
 
 class DBStorage:
-    """ this clas manages storage using mysqlalchemy with my MYSQL database"""
+    """this class manages storage using mysqlalchemy with my MYSQL database """
     __engine = None
     __session = None
 
@@ -54,7 +54,6 @@ class DBStorage:
                 for value in query_result:
                     key = f"{value.__class__.__name__}.{value.id}"
                     db_dictionary[key] = value
-
         return db_dictionary
 
     def new(self, obj):
@@ -71,7 +70,7 @@ class DBStorage:
             self.__session.delete(obj)
 
     def reload(self):
-        """ create all tables in the databse and create a session """
+        """ create all tables in the database and create a session """
         from models.state import State
         from models.user import User
         from models.city import City
@@ -84,10 +83,9 @@ class DBStorage:
         # create a session factory
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         # Use scoped_session to ensure thread safety
-        Session = scoped_session(session_factory)
-        # set the instance attribute __session
-        self.__session = Session()
+        self.__session= scoped_session(session_factory)
 
     def close(self):
-        """ closes all sesions """
-        self.__session.close()
+        """ call remove on private session attributes"""
+        if self.__session:
+            self.__session.remove() #Remove the current session to clean up

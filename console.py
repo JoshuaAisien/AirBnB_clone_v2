@@ -258,7 +258,7 @@ class HBNBCommand(cmd.Cmd):
         if not print_list:
             print("** no instance found **")
         else:
-            print("[", ", ".join(print_list), "]")
+            print(print_list)
 
     def help_all(self):
         """ Help information for the all command """
